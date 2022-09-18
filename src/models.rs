@@ -30,7 +30,7 @@ pub enum OrderType {
         /// other side of the order book.
         side: Side,
         /// The order quantity.
-        qty: u64,
+        qty: f64,
     },
     /// A limit order, which is either filled immediately, or added to the order
     /// book.
@@ -41,10 +41,10 @@ pub enum OrderType {
         /// other side of the order book.
         side: Side,
         /// The order quantity.
-        qty: u64,
+        qty: f64,
         /// The limit price. The order book will only match this order with
         /// other orders at this price or better.
-        price: u64,
+        price: f64,
     },
     /// A cancel order, which removes the order with the specified ID from the
     /// order book.
@@ -81,7 +81,7 @@ pub enum OrderEvent {
         /// The ID of the order this event is referring to.
         id: u128,
         /// The filled quantity.
-        filled_qty: u64,
+        filled_qty: f64,
         /// A vector with information on the order fills.
         fills: Vec<FillMetadata>,
     },
@@ -91,7 +91,7 @@ pub enum OrderEvent {
         /// The ID of the order this event is referring to.
         id: u128,
         /// The filled quantity.
-        filled_qty: u64,
+        filled_qty: f64,
         /// A vector with information on the order fills.
         fills: Vec<FillMetadata>,
     },
@@ -106,9 +106,9 @@ pub struct FillMetadata {
     /// The ID of the matching order.
     pub order_2: u128,
     /// The quantity that was traded.
-    pub qty: u64,
+    pub qty: f64,
     /// The price at which the trade happened.
-    pub price: u64,
+    pub price: f64,
     /// The side of the taker order (order 1)
     pub taker_side: Side,
     /// Whether this order was a total (true) or partial (false) fill of the
@@ -136,30 +136,30 @@ pub struct BookDepth {
 #[derive(Debug, Clone, PartialEq)]
 pub struct BookLevel {
     /// The price point this level represents.
-    pub price: u64,
+    pub price: f64,
     /// The total quantity of all orders resting at the specified price point.
-    pub qty: u64,
+    pub qty: f64,
 }
 
 /// A trade that happened as part of the matching process.
 #[derive(Debug, Copy, Clone)]
 pub struct Trade {
     /// The total quantity transacted as part of this trade.
-    pub total_qty: u64,
+    pub total_qty: f64,
     /// The volume-weighted average price computed from all the order fills
     /// within this trade.
     pub avg_price: f64,
     /// The price of the last fill that was part of this trade.
-    pub last_price: u64,
+    pub last_price: f64,
     /// The quantity of the last fill that was part of this trade.
-    pub last_qty: u64,
+    pub last_qty: f64,
 }
 
 #[derive(Debug, PartialEq)]
 pub struct LimitOrder {
     pub id: u128,
-    pub qty: u64,
-    pub price: u64,
+    pub qty: f64,
+    pub price: f64,
 }
 
 #[cfg(test)]
