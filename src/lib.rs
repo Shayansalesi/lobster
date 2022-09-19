@@ -39,8 +39,6 @@
 
 #![warn(missing_docs, missing_debug_implementations, rustdoc::broken_intra_doc_links)]
 
-#![feature(map_first_last)]
-
 mod arena;
 mod models;
 mod orderbook;
