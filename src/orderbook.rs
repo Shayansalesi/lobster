@@ -115,6 +115,44 @@ impl OrderBook {
         self.traded_volume
     }
 
+    /// Get the volume of the best bid
+    pub fn bid_vol(&self) -> Option<f64> {
+        if let Some((price, queue)) = self.bids.last_key_value() {
+            let mut qty = 0.0;
+            for idx in queue {
+                qty += self.arena[*idx].qty;
+            }
+            if qty > 0.0 {
+                return Some(qty);
+            }
+            else {
+                return Some(0.0);
+            }
+        }
+        else {
+            return None;
+        }
+    }
+
+    /// Get the volume of the best ask
+    pub fn ask_vol(&self) -> Option<f64> {
+        if let Some((price, queue)) = self.asks.first_key_value() {
+            let mut qty = 0.0;
+            for idx in queue {
+                qty += self.arena[*idx].qty;
+            }
+            if qty > 0.0 {
+                return Some(qty);
+            }
+            else {
+                return Some(0.0);
+            }
+        }
+        else {
+            return None;
+        }
+    }
+
     /// Return the order book depth as a [`BookDepth`] struct, up to the
     /// specified level. Bids and offers at the same price level are merged in a
     /// single [`BookLevel`] struct.
