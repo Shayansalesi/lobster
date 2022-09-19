@@ -117,12 +117,21 @@ impl OrderBook {
 
     /// Get the volume of the best bid
     pub fn bid_vol(&self) -> Option<f64> {
+        if let Some(best_bid) = self.max_bid() {
+            let ggg = self.bids.get(&best_bid.to_string());
+            if let Some(vec) = ggg {
+                let mut qty = 0.0;
+                for idx in vec {
+                    qty += self.arena[*idx].qty;
+                }
+                println!("FIRST BID QUANTITY: {}", qty);
+            }
+        }
         if let Some((price, queue)) = self.bids.last_key_value() {
             let mut qty = 0.0;
             for idx in queue {
                 qty += self.arena[*idx].qty;
             }
-            println!("QUANTITY BID VOL: {}", qty);
             if qty > 0.0 {
                 return Some(qty);
             }
@@ -142,7 +151,6 @@ impl OrderBook {
             for idx in queue {
                 qty += self.arena[*idx].qty;
             }
-            println!("QUANTITY ASK VOL: {}", qty);
             if qty > 0.0 {
                 return Some(qty);
             }
