@@ -122,6 +122,7 @@ impl OrderBook {
             for idx in queue {
                 qty += self.arena[*idx].qty;
             }
+            println!("QUANTITY BID VOL: {}", qty);
             if qty > 0.0 {
                 return Some(qty);
             }
@@ -141,6 +142,7 @@ impl OrderBook {
             for idx in queue {
                 qty += self.arena[*idx].qty;
             }
+            println!("QUANTITY ASK VOL: {}", qty);
             if qty > 0.0 {
                 return Some(qty);
             }
