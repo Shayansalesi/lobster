@@ -124,43 +124,57 @@ impl OrderBook {
                 for idx in vec {
                     qty += self.arena[*idx].qty;
                 }
-                println!("FIRST BID QUANTITY: {}", qty);
-            }
-        }
-        if let Some((price, queue)) = self.bids.last_key_value() {
-            let mut qty = 0.0;
-            for idx in queue {
-                qty += self.arena[*idx].qty;
-            }
-            if qty > 0.0 {
                 return Some(qty);
             }
-            else {
-                return Some(0.0);
-            }
+            else {return None}
         }
-        else {
-            return None;
-        }
+        else {return None}
+        // if let Some((price, queue)) = self.bids.last_key_value() {
+        //     let mut qty = 0.0;
+        //     for idx in queue {
+        //         qty += self.arena[*idx].qty;
+        //     }
+        //     if qty > 0.0 {
+        //         return Some(qty);
+        //     }
+        //     else {
+        //         return Some(0.0);
+        //     }
+        // }
+        // else {
+        //     return None;
+        // }
     }
 
     /// Get the volume of the best ask
     pub fn ask_vol(&self) -> Option<f64> {
-        if let Some((price, queue)) = self.asks.first_key_value() {
-            let mut qty = 0.0;
-            for idx in queue {
-                qty += self.arena[*idx].qty;
-            }
-            if qty > 0.0 {
+        if let Some(best_ask) = self.min_ask() {
+            let gg = self.asks.get(&best_ask.to_string());
+            if let Some(vec) = gg {
+                let mut qty = 0.0;
+                for idx in vec {
+                    qty += self.arena[*idx].qty;
+                }
                 return Some(qty);
             }
-            else {
-                return Some(0.0);
-            }
+            else { return None }
         }
-        else {
-            return None;
-        }
+        else {return None }
+        // if let Some((price, queue)) = self.asks.first_key_value() {
+        //     let mut qty = 0.0;
+        //     for idx in queue {
+        //         qty += self.arena[*idx].qty;
+        //     }
+        //     if qty > 0.0 {
+        //         return Some(qty);
+        //     }
+        //     else {
+        //         return Some(0.0);
+        //     }
+        // }
+        // else {
+        //     return None;
+        // }
     }
 
     /// Return the order book depth as a [`BookDepth`] struct, up to the
