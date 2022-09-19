@@ -277,9 +277,9 @@ impl OrderBook {
     fn _execute(&mut self, event: OrderType) -> OrderEvent {
         match event {
             OrderType::Market { id, side, qty } => {
-                let (fills, partial, filled_qty) = self.market(id, side, qty);
+                let (fills, partial, filled_qty) = self.market(id.clone(), side, qty);
                 if fills.is_empty() {
-                    OrderEvent::Unfilled { id }
+                    OrderEvent::Unfilled { id: id.clone() }
                 } else if partial {
                     OrderEvent::PartiallyFilled {
                         id,
@@ -301,32 +301,32 @@ impl OrderBook {
                 price,
             } => {
                 let (fills, partial, filled_qty) =
-                    self.limit(id, side, qty, price);
+                    self.limit(id.clone(), side, qty, price);
                 if fills.is_empty() {
-                    OrderEvent::Placed { id }
+                    OrderEvent::Placed { id: id.clone() }
                 } else if partial {
                     OrderEvent::PartiallyFilled {
-                        id,
+                        id: id.clone(),
                         filled_qty,
                         fills,
                     }
                 } else {
                     OrderEvent::Filled {
-                        id,
+                        id: id.clone(),
                         filled_qty,
                         fills,
                     }
                 }
             }
             OrderType::Cancel { id } => {
-                self.cancel(id);
-                OrderEvent::Canceled { id }
+                self.cancel(id.clone());
+                OrderEvent::Canceled { id: id.clone() }
             }
         }
     }
 
-    fn cancel(&mut self, id: u128) -> bool {
-        if let Some((price, idx)) = self.arena.get(id) {
+    fn cancel(&mut self, id: String) -> bool {
+        if let Some((price, idx)) = self.arena.get(id.clone()) {
             if let Some(ref mut queue) = self.asks.get_mut(&price.to_string()) {
                 if let Some(i) = queue.iter().position(|i| *i == idx) {
                     queue.remove(i);
@@ -345,7 +345,7 @@ impl OrderBook {
 
     fn market(
         &mut self,
-        id: u128,
+        id: String,
         side: Side,
         qty: f64,
     ) -> (Vec<FillMetadata>, bool, f64) {
@@ -363,7 +363,7 @@ impl OrderBook {
 
     fn limit(
         &mut self,
-        id: u128,
+        id: String,
         side: Side,
         qty: f64,
         price: f64,
@@ -375,10 +375,10 @@ impl OrderBook {
         match side {
             Side::Bid => {
                 remaining_qty =
-                    self.match_with_asks(id, qty, &mut fills, Some(price));
+                    self.match_with_asks(id.clone(), qty, &mut fills, Some(price));
                 if remaining_qty > 0.0 {
                     partial = true;
-                    let index = self.arena.insert(id, price, remaining_qty);
+                    let index = self.arena.insert(id.clone(), price, remaining_qty);
                     let queue_capacity = self.default_queue_capacity;
                     self.bids
                         .entry(price.to_string())
@@ -397,10 +397,10 @@ impl OrderBook {
             }
             Side::Ask => {
                 remaining_qty =
-                    self.match_with_bids(id, qty, &mut fills, Some(price));
+                    self.match_with_bids(id.clone(), qty, &mut fills, Some(price));
                 if remaining_qty > 0.0 {
                     partial = true;
-                    let index = self.arena.insert(id, price, remaining_qty);
+                    let index = self.arena.insert(id.clone(), price, remaining_qty);
                     if let Some(a) = self.min_ask {
                         if price < a {
                             self.min_ask = Some(price);
@@ -429,7 +429,7 @@ impl OrderBook {
 
     fn match_with_asks(
         &mut self,
-        id: u128,
+        id: String,
         qty: f64,
         fills: &mut Vec<FillMetadata>,
         limit_price: Option<f64>,
@@ -457,7 +457,7 @@ impl OrderBook {
                 &mut self.arena,
                 queue,
                 remaining_qty,
-                id,
+                id.clone(),
                 Side::Bid,
                 fills,
             );
@@ -473,7 +473,7 @@ impl OrderBook {
 
     fn match_with_bids(
         &mut self,
-        id: u128,
+        id: String,
         qty: f64,
         fills: &mut Vec<FillMetadata>,
         limit_price: Option<f64>,
@@ -501,7 +501,7 @@ impl OrderBook {
                 &mut self.arena,
                 queue,
                 remaining_qty,
-                id,
+                id.clone(),
                 Side::Ask,
                 fills,
             );
@@ -540,7 +540,7 @@ impl OrderBook {
         arena: &mut OrderArena,
         opposite_orders: &mut Vec<usize>,
         remaining_qty: f64,
-        id: u128,
+        id: String,
         side: Side,
         fills: &mut Vec<FillMetadata>,
     ) -> f64 {
@@ -574,8 +574,8 @@ impl OrderBook {
             }
             head_order.qty -= traded_quantity;
             let fill = FillMetadata {
-                order_1: id,
-                order_2: head_order.id,
+                order_1: id.clone(),
+                order_2: head_order.id.clone(),
                 qty: traded_quantity,
                 price: traded_price,
                 taker_side: side,

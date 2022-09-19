@@ -7,7 +7,7 @@ use crate::models::LimitOrder;
 pub struct OrderArena {
     orders: Vec<LimitOrder>,
     free: Vec<usize>,
-    order_map: HashMap<u128, usize>,
+    order_map: HashMap<String, usize>,
 }
 
 impl OrderArena {
@@ -21,7 +21,7 @@ impl OrderArena {
         // Preallocate
         for i in 0..capacity {
             list.orders.push(LimitOrder {
-                id: 0,
+                id: String::from("0"),
                 price: 0.0,
                 qty: 0.0,
             });
@@ -30,37 +30,37 @@ impl OrderArena {
         list
     }
 
-    pub fn get(&self, id: u128) -> Option<(f64, usize)> {
+    pub fn get(&self, id: String) -> Option<(f64, usize)> {
         self.order_map.get(&id).map(|i| (self.orders[*i].price, *i))
     }
 
     #[cfg(test)]
-    pub fn get_full(&self, id: u128) -> Option<(f64, f64, usize)> {
+    pub fn get_full(&self, id: String) -> Option<(f64, f64, usize)> {
         self.order_map
             .get(&id)
             .map(|i| (self.orders[*i].price, self.orders[*i].qty, *i))
     }
 
-    pub fn insert(&mut self, id: u128, price: f64, qty: f64) -> usize {
+    pub fn insert(&mut self, id: String, price: f64, qty: f64) -> usize {
         match self.free.pop() {
             None => {
-                self.orders.push(LimitOrder { id, price, qty });
+                self.orders.push(LimitOrder { id: id.clone(), price, qty });
                 let index = self.orders.len() - 1;
-                self.order_map.insert(id, index);
+                self.order_map.insert(id.clone( ), index);
                 index
             }
             Some(index) => {
                 let ord = &mut self.orders[index];
-                ord.id = id;
+                ord.id = id.clone();
                 ord.qty = qty;
                 ord.price = price;
-                self.order_map.insert(id, index);
+                self.order_map.insert(id.clone(), index);
                 index
             }
         }
     }
 
-    pub fn delete(&mut self, id: &u128) -> bool {
+    pub fn delete(&mut self, id: &String) -> bool {
         if let Some(idx) = self.order_map.remove(id) {
             if let Some(mut ord) = self.orders.get_mut(idx) {
                 self.free.push(idx);

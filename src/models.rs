@@ -19,13 +19,13 @@ impl std::ops::Not for Side {
 }
 
 /// An order to be executed by the order book.
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 pub enum OrderType {
     /// A market order, which is either filled immediately (even partially), or
     /// canceled.
     Market {
         /// The unique ID of this order.
-        id: u128,
+        id: String,
         /// The order side. It will be matched against the resting orders on the
         /// other side of the order book.
         side: Side,
@@ -36,7 +36,7 @@ pub enum OrderType {
     /// book.
     Limit {
         /// The unique ID of this order.
-        id: u128,
+        id: String,
         /// The order side. It will be matched against the resting orders on the
         /// other side of the order book.
         side: Side,
@@ -50,7 +50,7 @@ pub enum OrderType {
     /// order book.
     Cancel {
         /// The unique ID of the order to be canceled.
-        id: u128,
+        id: String,
     },
 }
 
@@ -61,25 +61,25 @@ pub enum OrderEvent {
     /// in response to market orders.
     Unfilled {
         /// The ID of the order this event is referring to.
-        id: u128,
+        id: String,
     },
     /// Indicating that the corresponding order was placed on the order book. It
     /// is only send in response to limit orders.
     Placed {
         /// The ID of the order this event is referring to.
-        id: u128,
+        id: String,
     },
     /// Indicating that the corresponding order was removed from the order book.
     /// It is only sent in response to cancel orders.
     Canceled {
         /// The ID of the order this event is referring to.
-        id: u128,
+        id: String,
     },
     /// Indicating that the corresponding order was only partially filled. It is
     /// sent in response to market or limit orders.
     PartiallyFilled {
         /// The ID of the order this event is referring to.
-        id: u128,
+        id: String,
         /// The filled quantity.
         filled_qty: f64,
         /// A vector with information on the order fills.
@@ -89,7 +89,7 @@ pub enum OrderEvent {
     /// sent in response to market or limit orders.
     Filled {
         /// The ID of the order this event is referring to.
-        id: u128,
+        id: String,
         /// The filled quantity.
         filled_qty: f64,
         /// A vector with information on the order fills.
@@ -99,12 +99,12 @@ pub enum OrderEvent {
 
 /// Information on a single order fill. When an order is matched with multiple
 /// resting orders, it generates multiple `FillMetadata` values.
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct FillMetadata {
     /// The ID of the order that triggered the fill (taker).
-    pub order_1: u128,
+    pub order_1: String,
     /// The ID of the matching order.
-    pub order_2: u128,
+    pub order_2: String,
     /// The quantity that was traded.
     pub qty: f64,
     /// The price at which the trade happened.
@@ -157,7 +157,7 @@ pub struct Trade {
 
 #[derive(Debug, PartialEq)]
 pub struct LimitOrder {
-    pub id: u128,
+    pub id: String,
     pub qty: f64,
     pub price: f64,
 }
